@@ -63,7 +63,7 @@ func TestMSPParsers(t *testing.T) {
 }
 
 func GetDevMspDir() string {
-    return "../cmd/data/orderer.acme.com/msp"
+    return "../cmd/data/msp"
 }
 
 func TestMSPSetupNoCryptoConf(t *testing.T) {

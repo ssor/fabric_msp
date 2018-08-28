@@ -72,6 +72,10 @@ func (id *identity) Validate() error {
 
 // GetOrganizationalUnits returns the OU for this instance
 func (id *identity) GetOrganizationalUnits() []*OUIdentifier {
+    if id.cert == nil {
+        return nil
+    }
+
     cid, err := id.msp.getCertificationChainIdentifier(id)
     if err != nil {
         mspIdentityLogger.Errorf("Failed getting certification chain identifier for [%v]: [%s]", id, err)
@@ -178,7 +182,7 @@ func newSigningIdentity(id *IdentityIdentifier, cert *x509.Certificate, pk bccsp
     if err != nil {
         return nil, err
     }
-    if cert == nil{
+    if cert == nil {
         mspIdentityLogger.Warn("cert is nil")
     }
     return &signingidentity{identity: *mspId.(*identity), signer: signer}, nil
