@@ -40,7 +40,7 @@ import (
 	"github.com/ssor/fabric_msp/bccsp/signer"
 	"github.com/ssor/fabric_msp/bccsp/sw"
 	"github.com/ssor/fabric_msp/bccsp/utils"
-	"github.com/op/go-logging"
+	//"github.com/op/go-logging"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/sha3"
 )
@@ -60,7 +60,7 @@ type testConfig struct {
 
 func TestMain(m *testing.M) {
 	// Activate DEBUG level to cover listAttrs function
-	logging.SetLevel(logging.DEBUG, "bccsp_p11")
+	//logging.SetLevel(logging.DEBUG, "bccsp_p11")
 
 	ks, err := sw.NewFileBasedKeyStore(nil, os.TempDir(), false)
 	if err != nil {

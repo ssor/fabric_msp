@@ -32,7 +32,7 @@ func LoadLocalMsp(dir string, bccspConfig *factory.FactoryOpts, mspID string) er
         return errors.New("The local MSP must have an ID")
     }
 
-    conf, err := msp.GetLocalMspConfig(dir, bccspConfig, mspID)
+    conf, err := msp.GetLocalMspConfig(mspID, dir, bccspConfig)
     if err != nil {
         return err
     }
@@ -44,11 +44,13 @@ func LoadLocalMsp(dir string, bccspConfig *factory.FactoryOpts, mspID string) er
 // THESE MAPS AND HELPSER FUNCTIONS SHOULD DISAPPEAR BECAUSE
 // OWNERSHIP OF PER-CHAIN MSP MANAGERS WILL BE HANDLED BY IT;
 // HOWEVER IN THE INTERIM, THESE HELPER FUNCTIONS ARE REQUIRED
+var (
+    m        sync.Mutex
+    localMsp msp.MSP
+    mspMap   = make(map[string]msp.MSPManager)
 
-var m sync.Mutex
-var localMsp msp.MSP
-var mspMap map[string]msp.MSPManager = make(map[string]msp.MSPManager)
-var mspLogger = zlog.New("fabric_msp", "msp")
+    mspLogger = zlog.New("fabric_msp", "msp")
+)
 
 // GetManagerForChain returns the msp manager for the supplied
 // chain; if no such manager exists, one is created
@@ -71,7 +73,6 @@ func GetDeserializers() map[string]msp.IdentityDeserializer {
     defer m.Unlock()
 
     clone := make(map[string]msp.IdentityDeserializer)
-
     for key, mspManager := range mspMap {
         clone[key] = mspManager
     }

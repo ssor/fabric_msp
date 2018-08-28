@@ -17,30 +17,28 @@ limitations under the License.
 package msp
 
 import (
-	"testing"
+    "testing"
 
-	"github.com/ssor/fabric_msp/core/config"
-	"github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/assert"
 )
 
 func TestGetLocalMspConfig(t *testing.T) {
-	mspDir, err := config.GetDevMspDir()
-	assert.NoError(t, err)
-	_, err = GetLocalMspConfig(mspDir, nil, "DEFAULT")
-	assert.NoError(t, err)
+    mspDir := GetDevMspDir()
+    _, err := GetLocalMspConfig("DEFAULT", mspDir, nil)
+    assert.NoError(t, err)
 }
 
 func TestGetLocalMspConfigFails(t *testing.T) {
-	_, err := GetLocalMspConfig("/tmp/", nil, "DEFAULT")
-	assert.Error(t, err)
+    _, err := GetLocalMspConfig("DEFAULT", "/tmp/", nil)
+    assert.Error(t, err)
 }
 
 func TestReadFileUtils(t *testing.T) {
-	// test that reading a file with an empty path doesn't crash
-	_, err := readPemFile("")
-	assert.Error(t, err)
+    // test that reading a file with an empty path doesn't crash
+    _, err := readPemFile("")
+    assert.Error(t, err)
 
-	// test that reading an existing file which is not a PEM file doesn't crash
-	_, err = readPemFile("/dev/null")
-	assert.Error(t, err)
+    // test that reading an existing file which is not a PEM file doesn't crash
+    _, err = readPemFile("/dev/null")
+    assert.Error(t, err)
 }

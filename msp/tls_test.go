@@ -19,12 +19,11 @@ package msp
 import (
 	"testing"
 
-	"github.com/op/go-logging"
 	"github.com/stretchr/testify/assert"
 )
 
 func init() {
-	logging.SetLevel(logging.DEBUG, "msp/identity")
+	//logging.SetLevel(logging.DEBUG, "msp/identity")
 }
 
 func TestTLSCAs(t *testing.T) {

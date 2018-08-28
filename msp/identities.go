@@ -10,7 +10,6 @@ import (
     "crypto"
     "crypto/rand"
     "crypto/x509"
-    "encoding/hex"
     "encoding/pem"
     "errors"
     "fmt"
@@ -38,12 +37,15 @@ type identity struct {
 }
 
 func newIdentity(id *IdentityIdentifier, cert *x509.Certificate, pk bccsp.Key, msp *bccspmsp) (Identity, error) {
-    mspIdentityLogger.Debugf("Creating identity instance for ID %s", certToPEM(cert))
+    //mspIdentityLogger.Debugf("Creating identity instance for ID %s", certToPEM(cert))
 
     // Sanitize first the certificate
     cert, err := msp.sanitizeCert(cert)
     if err != nil {
         return nil, err
+    }
+    if cert == nil {
+        zlog.Highlight("certificate is nil")
     }
     return &identity{id: id, cert: cert, pk: pk, msp: msp}, nil
 }
@@ -70,14 +72,9 @@ func (id *identity) Validate() error {
 
 // GetOrganizationalUnits returns the OU for this instance
 func (id *identity) GetOrganizationalUnits() []*OUIdentifier {
-    if id.cert == nil {
-        return nil
-    }
-
     cid, err := id.msp.getCertificationChainIdentifier(id)
     if err != nil {
         mspIdentityLogger.Errorf("Failed getting certification chain identifier for [%v]: [%s]", id, err)
-
         return nil
     }
 
@@ -124,8 +121,8 @@ func (id *identity) Verify(msg []byte, sig []byte) error {
         return fmt.Errorf("Failed computing digest [%s]", err)
     }
 
-    mspIdentityLogger.Debugf("Verify: digest = %s", hex.Dump(digest))
-    mspIdentityLogger.Debugf("Verify: sig = %s", hex.Dump(sig))
+    //mspIdentityLogger.Debugf("Verify: digest = %s", hex.Dump(digest))
+    //mspIdentityLogger.Debugf("Verify: sig = %s", hex.Dump(sig))
 
     valid, err := id.msp.bccsp.Verify(id.pk, sig, digest, nil)
     if err != nil {
@@ -181,6 +178,9 @@ func newSigningIdentity(id *IdentityIdentifier, cert *x509.Certificate, pk bccsp
     if err != nil {
         return nil, err
     }
+    if cert == nil{
+        mspIdentityLogger.Warn("cert is nil")
+    }
     return &signingidentity{identity: *mspId.(*identity), signer: signer}, nil
 }
 
@@ -198,13 +198,13 @@ func (id *signingidentity) Sign(msg []byte) ([]byte, error) {
     if err != nil {
         return nil, fmt.Errorf("Failed computing digest [%s]", err)
     }
-
-    if len(msg) < 32 {
-        mspIdentityLogger.Debugf("Sign: plaintext: %X \n", msg)
-    } else {
-        mspIdentityLogger.Debugf("Sign: plaintext: %X...%X \n", msg[0:16], msg[len(msg)-16:])
-    }
-    mspIdentityLogger.Debugf("Sign: digest: %X \n", digest)
+    //
+    //if len(msg) < 32 {
+    //    mspIdentityLogger.Debugf("Sign: plaintext: %X \n", msg)
+    //} else {
+    //    mspIdentityLogger.Debugf("Sign: plaintext: %X...%X \n", msg[0:16], msg[len(msg)-16:])
+    //}
+    //mspIdentityLogger.Debugf("Sign: digest: %X \n", digest)
 
     // Sign
     return id.signer.Sign(rand.Reader, digest, nil)
